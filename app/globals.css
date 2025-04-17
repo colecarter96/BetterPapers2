@@ -12,7 +12,14 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
 
 body {
   background: var(--background);
