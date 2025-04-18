@@ -26,7 +26,7 @@
 
 const Testimonial = () => {
     return (
-        <div className="hidden md:block bg-blue-200 py-6">
+        <div className="hidden md:block bg-blue-200 py-10">
             <div className="flex flex-row  justify-center gap-12 md:gap-26 lg:gap-48 text-center max-w-4xl mx-auto">
                 <div>
                     <h3 className="text-3xl text-blue-700 font-bold">#3</h3>
