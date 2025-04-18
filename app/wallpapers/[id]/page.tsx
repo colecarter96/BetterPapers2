@@ -1,4 +1,27 @@
-import ImageCarousel from '../../components/Carousel';
+'use client';
+
+import dynamic from 'next/dynamic';
+
+// Dynamically import the Carousel with no SSR
+const Carousel = dynamic(() => import('../../components/Carousel'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ width: '70vw', height: '70vw', position: 'relative' }}>
+      <img
+        src="https://i.postimg.cc/GmjPjg63/Untitled-design-7.png"
+        alt="Loading..."
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }}
+      />
+    </div>
+  )
+});
 
 const product = {
   id: '1',
@@ -26,15 +49,15 @@ export default function ProductPage() {
         {/* Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-8">
           {/* Carousel */}
-          <div className="w-full max-w-[400px] mx-auto lg:mx-0 lg:ml-[-1rem]">
+          <div className="w-full max-w-[500px] mx-auto lg:mx-0 lg:ml-[-1rem]">
             <div className="block md:hidden">
-              <ImageCarousel images={product.images} interval={4000} width={70} />
+              <Carousel images={product.images} interval={4000} width={100} containerBased={true} />
             </div>
             <div className="hidden md:block lg:hidden">
-              <ImageCarousel images={product.images} interval={4000} width={40} />
+              <Carousel images={product.images} interval={4000} width={100} containerBased={true} />
             </div>
             <div className="hidden lg:block">
-              <ImageCarousel images={product.images} interval={4000} width={30} />
+              <Carousel images={product.images} interval={4000} width={100} containerBased={true} />
             </div>
           </div>
 

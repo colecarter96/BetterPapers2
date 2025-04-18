@@ -19,13 +19,12 @@ export default function Home() {
       <Testimonial />
     
       <About />
-      <div className="block md:hidden py-10">
-        
+      <div className="md:hidden py-10 flex flex-col items-center">
         <ImageCarousel images={images} interval={4000} width={80} />
         <h3 className="text-center text-xl pt-2 font-bold">Featured Designs</h3>
       </div>
 
-      <div className="hidden md:block py-10">
+      <div className="hidden md:flex md:justify-center py-10">
         <ImageCarousel images={images} interval={4000} width={50} />
       </div>
     </div>

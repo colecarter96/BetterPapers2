@@ -21,7 +21,9 @@ function Header() {
 
             <div className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-blue-400/80">
                 <div className="flex justify-between items-center h-18">
-                    <h1 className="pl-10 text-xl md:pl-24 md:text-2xl">backdrops.</h1>
+                    <Link href="/" className="pl-10 text-xl md:pl-24 md:text-2xl hover:opacity-80 transition-opacity">
+                        backdrops.
+                    </Link>
 
                     {/* Desktop Navigation */}
                     <nav className="hidden md:flex text-lg md:pr-21 md:text-xl">
