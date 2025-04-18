@@ -2,7 +2,7 @@
 
 const Hero = () => {
     return(
-        <div className=" md:flex md:justify-center h-[70vh] bg-blue-400">
+        <div className="pt-10 md:pt-16 md:flex md:justify-center h-[70vh] bg-blue-400">
             <div className=" hidden md:block text-left my-auto pl-44">
                 <h2 className="text-white text-2xl font-bold">Decorate your digital world.</h2>
                 <p className="max-w-prose text-blue-900 text-xl">Relive your childhood years with the retro wallpaper pack. It features GameBoys, Nokia Phones, iPods and more.</p>
