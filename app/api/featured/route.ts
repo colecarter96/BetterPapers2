@@ -4,6 +4,7 @@ import { getFeaturedProducts } from '@/app/lib/firestore';
 export async function GET() {
   try {
     const featuredProducts = await getFeaturedProducts();
+    console.log('Featured products from Firestore:', featuredProducts);
     return NextResponse.json(featuredProducts);
   } catch (error) {
     console.error('Error fetching featured products:', error);

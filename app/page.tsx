@@ -56,10 +56,12 @@ export default function Home() {
           setFeaturedProducts([]);
         } else {
           const featuredData = await featuredResponse.json();
+          console.log('Featured products data:', featuredData);
           if (!Array.isArray(featuredData)) {
-            console.warn('Invalid featured products data format');
+            console.warn('Invalid featured products data format:', featuredData);
             setFeaturedProducts([]);
           } else {
+            console.log('Setting featured products:', featuredData);
             setFeaturedProducts(featuredData);
           }
         }
@@ -97,24 +99,26 @@ export default function Home() {
       <Testimonial />
       <About />
       
-      <div className="block md:hidden py-10 flex flex-col items-center">
-        <Carousel 
-          images={featuredProducts.map(product => product.image.src)} 
-          interval={4000} 
-          width={80} 
-          containerBased={true}
-        />
-        <h3 className="text-center text-xl pt-2 font-bold">Featured Designs</h3>
-      </div>
-
-      <div className="hidden md:block py-10 flex justify-center">
-        <Carousel 
-          images={featuredProducts.map(product => product.image.src)} 
-          interval={4000} 
-          width={50} 
-          containerBased={true}
-        />
-      </div>
+      {featuredProducts.length > 0 && (
+        <div className="py-10">
+          <div className="w-full max-w-4xl mx-auto">
+            <Carousel 
+              images={featuredProducts.map(product => product.image.src)}
+              interval={5000}
+              width={100}
+              containerBased={true}
+            />
+            {/* <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {featuredProducts.map((product, index) => (
+                <div key={product.id} className="text-center">
+                  <h3 className="text-lg font-semibold">{product.title}</h3>
+                  <p className="text-gray-600">${product.price}</p>
+                </div>
+              ))}
+            </div> */}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

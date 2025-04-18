@@ -12,32 +12,26 @@ interface CarouselProps {
 
 const Carousel = ({ images, interval = 3000, width = 100, containerBased = false }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMounted, setIsMounted] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Only start the carousel after hydration is complete
   useEffect(() => {
-    setIsMounted(true);
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, []);
-
-  // Start the timer only after mounting
-  useEffect(() => {
-    if (isMounted) {
-      timerRef.current = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-      }, interval);
+    // Clear any existing interval
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
+
+    // Start new interval
+    timerRef.current = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, interval);
+
+    // Cleanup
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
     };
-  }, [isMounted, images.length, interval]);
+  }, [images.length, interval]);
 
   const containerStyle = containerBased 
     ? { width: '100%', maxWidth: `${width}%` }
@@ -70,7 +64,7 @@ const Carousel = ({ images, interval = 3000, width = 100, containerBased = false
     </div>
   );
 
-  if (!isMounted) {
+  if (images.length === 0) {
     return initialRender;
   }
 
@@ -95,7 +89,8 @@ const Carousel = ({ images, interval = 3000, width = 100, containerBased = false
             width: '100%',
             height: '100%',
             opacity: index === currentIndex ? 1 : 0,
-            transition: 'opacity 0.5s ease-in-out'
+            transition: 'opacity 0.5s ease-in-out',
+            zIndex: index === currentIndex ? 1 : 0
           }}
         >
           <img
@@ -112,14 +107,30 @@ const Carousel = ({ images, interval = 3000, width = 100, containerBased = false
 
       {/* Arrows */}
       <button
-        onClick={() => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2"
+        onClick={() => {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+          timerRef.current = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+          }, interval);
+        }}
+        className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 z-10"
       >
         <ChevronLeft className="w-6 h-6 text-black" />
       </button>
       <button
-        onClick={() => setCurrentIndex((prev) => (prev + 1) % images.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2"
+        onClick={() => {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          setCurrentIndex((prev) => (prev + 1) % images.length);
+          timerRef.current = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+          }, interval);
+        }}
+        className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white rounded-full p-2 z-10"
       >
         <ChevronRight className="w-6 h-6 text-black" />
       </button>
