@@ -40,7 +40,7 @@ const ProductCard = ({ id, image, title, price }: ProductCardProps) => (
           <p className="text-blue-500 font-medium">${price}</p>
         </div>
         <button className="w-full mt-4 bg-gray-700 text-white py-2 rounded-lg">
-          Add to Cart
+          Buy Now
         </button>
       </div>
     </div>

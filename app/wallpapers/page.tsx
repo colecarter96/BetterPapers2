@@ -1,89 +1,109 @@
-import ProductCard, { QuoteCard } from '../components/ProductCard';
+'use client';
 
-const images = [
-  'https://i.postimg.cc/GmjPjg63/Untitled-design-7.png',
-  'https://i.postimg.cc/GmjPjg63/Untitled-design-7.png',
-  'https://i.postimg.cc/GmjPjg63/Untitled-design-7.png',
-  'https://i.postimg.cc/GmjPjg63/Untitled-design-7.png',
-];
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Loading from '../components/Loading';
 
-const quotes = [
-  "Life is too short to not enjoy every moment",
-  "Find joy in the little things",
-  "Your happiness is your responsibility",
-  "Every day is a new opportunity",
-  "Be present, be grateful",
-  "Live life with purpose and passion"
-];
+interface ProductPack {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  images: {
+    src: string;
+    alt?: string;
+  }[];
+  thumbnail: {
+    src: string;
+    alt?: string;
+  };
+  featured?: boolean;
+}
 
-const categories = [
-  {
-    title: "Retro Collection",
-    description: "Relive the golden age of technology with our retro-inspired wallpapers.",
-    images: images
-  },
-  {
-    title: "Minimalist Series",
-    description: "Clean, simple designs for a modern digital aesthetic.",
-    images: images
-  },
-  {
-    title: "Gaming Edition",
-    description: "Show your gaming pride with these vibrant designs.",
-    images: images
-  }
-];
+export default function WallpapersPage() {
+  const [productPacks, setProductPacks] = useState<ProductPack[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function Wallpapers() {
-  const allProducts = categories.flatMap((category, index) =>
-    category.images.map((image, imgIndex) => ({
-      type: 'product',
-      data: {
-        id: `${category.title.toLowerCase().replace(/\s+/g, '-')}-${imgIndex + 1}`,
-        image,
-        title: `${category.title} #${imgIndex + 1}`,
-        price: (9.99 + imgIndex).toFixed(2)
-      }
-    }))
-  );
-
-  // Insert quote cards every third position
-  const items = allProducts.reduce((acc: any[], item, index) => {
-    if (index > 0 && index % 3 === 0) {
-      acc.push({
-        type: 'quote',
-        data: {
-          quote: `"${quotes[Math.floor(index / 3) % quotes.length]}"`
+  useEffect(() => {
+    const fetchProductPacks = async () => {
+      try {
+        const response = await fetch('/api/packs');
+        if (!response.ok) {
+          console.warn('No product packs available');
+          setProductPacks([]);
+        } else {
+          const data = await response.json();
+          if (!Array.isArray(data)) {
+            console.warn('Invalid product packs data format');
+            setProductPacks([]);
+          } else {
+            // Ensure all required fields are present and properly formatted
+            const validatedPacks = data.map(pack => ({
+              ...pack,
+              price: typeof pack.price === 'number' ? pack.price : 0,
+              description: pack.description || '',
+              images: Array.isArray(pack.images) ? pack.images : [],
+              thumbnail: pack.thumbnail || { src: '', alt: '' }
+            }));
+            setProductPacks(validatedPacks);
+          }
         }
-      });
-    }
-    acc.push(item);
-    return acc;
+      } catch (error) {
+        console.error('Error fetching product packs:', error);
+        setError(error instanceof Error ? error.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductPacks();
   }, []);
 
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-32">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-blue-900">Our Wallpaper Collections</h1>
-        <p className="text-lg text-gray-600 mt-2">
-          Discover our curated selection of digital wallpapers designed to transform your devices.
-        </p>
-      </div>
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((item, index) => (
-          item.type === 'quote' ? (
-            <QuoteCard key={`quote-${index}`} quote={item.data.quote} />
-          ) : (
-            <ProductCard
-              key={`product-${index}`}
-              id={item.data.id}
-              image={item.data.image}
-              title={item.data.title}
-              price={item.data.price}
-            />
-          )
-        ))}
+  if (error) {
+    return <div className="text-red-600">{error}</div>;
+  }
+
+  if (!productPacks.length) {
+    return <div>No wallpaper packs available</div>;
+  }
+
+  return (
+    <div className="py-12 pt-32">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Our Wallpaper Packs</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {productPacks.map((pack) => (
+            <Link 
+              key={pack.id} 
+              href={`/wallpapers/${pack.id}`}
+              className="group"
+            >
+              <div className="bg-white rounded-lg overflow-hidden">
+                <div className="aspect-square relative">
+                  <img
+                    src={pack.thumbnail.src}
+                    alt={pack.thumbnail.alt || pack.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h2 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    {pack.title}
+                  </h2>
+                  <p className="text-gray-600 mt-2 line-clamp-2">{pack.description}</p>
+                  <p className="text-blue-600 font-semibold mt-4">
+                    ${typeof pack.price === 'number' ? pack.price.toFixed(2) : '0.00'}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
