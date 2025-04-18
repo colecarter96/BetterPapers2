@@ -1,65 +1,114 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-interface ImageCarouselProps {
+interface CarouselProps {
   images: string[];
   interval?: number;
-  width?: number; // in vw units
+  width?: number; // in vw units or percentage of container
+  containerBased?: boolean;
 }
 
-const ImageCarousel: React.FC<ImageCarouselProps> = ({
-  images,
-  interval = 3000,
-  width = 50,
-}) => {
+const Carousel = ({ images, interval = 3000, width = 100, containerBased = false }: CarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isClient, setIsClient] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Only start the carousel after hydration is complete
   useEffect(() => {
-    setIsClient(true);
-    const timer = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, interval);
+    setIsMounted(true);
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
 
-    return () => clearInterval(timer);
-  }, [images.length, interval]);
+  // Start the timer only after mounting
+  useEffect(() => {
+    if (isMounted) {
+      timerRef.current = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+      }, interval);
+    }
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [isMounted, images.length, interval]);
 
-  if (!isClient) {
-    return (
-      <div style={{ width: `${width}vw`, height: `${width}vw` }} className="relative">
-        <img
-          src={images[0]}
-          alt="Carousel image"
-          className="w-full h-full object-cover"
-        />
-      </div>
-    );
+  const containerStyle = containerBased 
+    ? { width: '100%', maxWidth: `${width}%` }
+    : { width: `${width}vw` };
+
+  // Initial render matches server exactly
+  const initialRender = (
+    <div 
+      style={{ 
+        ...containerStyle,
+        height: containerBased ? 'auto' : `${width}vw`,
+        aspectRatio: '1/1',
+        position: 'relative',
+        overflow: 'hidden',
+        margin: '0 auto'
+      }}
+    >
+      <img
+        src={images[0]}
+        alt="Carousel image"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          position: 'absolute',
+          top: 0,
+          left: 0
+        }}
+      />
+    </div>
+  );
+
+  if (!isMounted) {
+    return initialRender;
   }
 
   return (
-    <div
-      className="relative mx-auto aspect-square overflow-hidden"
-      style={{ width: `${width}vw`, height: `${width}vw` }}
+    <div 
+      style={{ 
+        ...containerStyle,
+        height: containerBased ? 'auto' : `${width}vw`,
+        aspectRatio: '1/1',
+        position: 'relative',
+        overflow: 'hidden',
+        margin: '0 auto'
+      }}
     >
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{
-          transform: `translateX(-${currentIndex * width}vw)`,
-          width: `${images.length * width}vw`,
-        }}
-      >
-        {images.map((img, idx) => (
+      {images.map((image, index) => (
+        <div
+          key={`carousel-${index}`}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            opacity: index === currentIndex ? 1 : 0,
+            transition: 'opacity 0.5s ease-in-out'
+          }}
+        >
           <img
-            key={idx}
-            src={img}
-            alt={`Slide ${idx}`}
-            className="object-contain"
-            style={{ width: `${width}vw`, height: `${width}vw` }}
+            src={image}
+            alt={`Carousel image ${index + 1}`}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
           />
-        ))}
-      </div>
+        </div>
+      ))}
 
       {/* Arrows */}
       <button
@@ -78,4 +127,4 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({
   );
 };
 
-export default ImageCarousel;
+export default Carousel;
