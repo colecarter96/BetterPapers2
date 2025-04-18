@@ -3,10 +3,10 @@ import { getProductPackById } from '@/app/lib/firestore';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const productPack = await getProductPackById(params.id);
+    const productPack = await getProductPackById(context.params.id);
     
     if (!productPack) {
       return NextResponse.json(
