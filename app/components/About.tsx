@@ -2,8 +2,8 @@
 
 const About = () =>{
     return (
-        <div className="">
-            <div className="m-10 text-center text-2xl">
+        <div className="m-10 ">
+            <div className="pb-6 text-center text-2xl">
                 Why backdrops?
             </div>
 
