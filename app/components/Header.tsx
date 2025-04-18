@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 function Header ()  {
     return(
-        <div className="flex justify-between items-center h-16 bg-blue-400">
+        <div className="flex justify-between items-center h-18 bg-blue-400">
             
             <h1 className="pl-24 text-2xl">backdrops.</h1>
 
