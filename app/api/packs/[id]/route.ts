@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProductPackById } from '@/app/lib/firestore';
 
+type RouteContext = {
+  params: {
+    id: string;
+  };
+};
+
 export async function GET(
   request: NextRequest,
-  context: { params: { id: string } }
+  { params }: RouteContext
 ) {
   try {
-    const productPack = await getProductPackById(context.params.id);
+    const productPack = await getProductPackById(params.id);
     
     if (!productPack) {
       return NextResponse.json(
